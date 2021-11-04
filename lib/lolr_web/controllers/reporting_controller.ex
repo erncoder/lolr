@@ -1,4 +1,8 @@
 defmodule LolrWeb.ReportingController do
+  @moduledoc """
+  Controller for api calls on the `reporting` context
+  """
+
   use LolrWeb, :controller
 
   alias Lolr.Reporting

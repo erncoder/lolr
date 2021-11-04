@@ -1,6 +1,6 @@
 defmodule Lolr.Clients.Riot do
   @moduledoc """
-  Client for the Riot API.
+  Client for the Riot API
   """
 
   use HTTPoison.Base
@@ -98,7 +98,7 @@ defmodule Lolr.Clients.Riot do
   def handle_response({:ok, %HTTPoison.Response{body: body, status_code: 200}}) do
     case Jason.decode(body) do
       {:ok, %{"name" => name, "puuid" => puuid}} ->
-        {:ok, %Summoner{name: name, puuid: puuid, last_matches: []}}
+        {:ok, %Summoner{name: name, puuid: puuid}}
 
       {:ok, _data} = resp ->
         resp

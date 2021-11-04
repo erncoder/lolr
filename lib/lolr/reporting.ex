@@ -44,7 +44,6 @@ defmodule Lolr.Reporting do
          {"get last matches", {:ok, match_ids}} <-
            {"get last matches", Riot.get_match_history_by_puuid(g_region, puuid, 5)} do
       other_summoners = get_other_summoners(g_region, match_ids, summoner_name)
-      summoner = Map.put(summoner, :last_matches, [])
       {:ok, summoner, other_summoners}
     else
       fail_tuple -> fail_tuple
@@ -69,7 +68,7 @@ defmodule Lolr.Reporting do
     participants
     |> Enum.map(fn %{"puuid" => puuid, "summonerName" => name} ->
       if name != primary_name do
-        %Summoner{name: name, puuid: puuid, last_matches: []}
+        %Summoner{name: name, puuid: puuid}
       else
         []
       end

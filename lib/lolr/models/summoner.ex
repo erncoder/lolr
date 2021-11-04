@@ -3,6 +3,6 @@ defmodule Lolr.Models.Summoner do
   Struct for a Summoner
   """
 
-  @req_fields [:name, :puuid, :last_matches]
+  @req_fields [:name, :puuid]
   defstruct @req_fields
 end

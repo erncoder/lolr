@@ -1,6 +1,6 @@
 defmodule Lolr.Reporting.Supervisor do
   @moduledoc """
-  Dynamically supervises Reporter GenServers
+  Dynamically supervises Reporting.Worker GenServers
   """
 
   use DynamicSupervisor

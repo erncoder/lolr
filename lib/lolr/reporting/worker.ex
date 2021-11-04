@@ -1,5 +1,6 @@
 defmodule Lolr.Reporting.Worker do
   @moduledoc """
+  This GenServer drives match checking and reporting for a particular "flight" of summoners.
   """
 
   use GenServer
@@ -58,11 +59,10 @@ defmodule Lolr.Reporting.Worker do
       if new_mins_left == 0 do
         DynamicSupervisor.terminate_child(ReportingSupervisor, self())
       else
-        new_summoners = check_matches(state)
+        check_matches(state)
 
         Map.merge(state, %{
           mins_left: new_mins_left,
-          summoners: new_summoners,
           last_check: new_last_check
         })
       end
@@ -72,16 +72,11 @@ defmodule Lolr.Reporting.Worker do
 
   def check_matches(%State{region: region, summoners: summoners, last_check: last_check}) do
     summoners
-    |> Enum.map(fn %Summoner{name: name, puuid: puuid, last_matches: last_matches} = summoner ->
+    |> Enum.map(fn %Summoner{name: name, puuid: puuid} ->
       case Riot.get_match_history_by_puuid(region, puuid, 5, last_check) do
         {:ok, fetched_matches} ->
           for fetched_match <- fetched_matches,
               do: Logger.info("Summoner #{name} completed match #{fetched_match}")
-
-          Map.put(summoner, :last_matches, fetched_matches ++ last_matches)
-
-        _ ->
-          summoner
       end
     end)
   end
