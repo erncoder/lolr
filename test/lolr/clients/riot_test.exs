@@ -14,7 +14,10 @@ defmodule Lolr.Clients.RiotTest do
   @america_regions ["BR1", "LA1", "LA2", "NA1", "OC1"]
   @asia_regions ["KR", "JP1"]
   @euro_regions ["EUN1", "EUW1", "RU", "TR1"]
-  @general_regions ["AMERICAS", "ASIA", "EUROPE"]
+
+  setup_all %{} do
+    MockMe.reset_flags()
+  end
 
   describe "get_summoner_by_name/2" do
     test "returns an ok tuple with a summoner struct if summoner exists and is in a valid region" do
@@ -77,7 +80,7 @@ defmodule Lolr.Clients.RiotTest do
       {:ok, region} = TestMe.fetch_all_regions() |> Enum.random() |> TestMe.generalize_region()
       assert {:ok, %{"info" => %{"participants" => participants}}} = TestMe.get_match_details(region, Faker.UUID.v4())
       assert is_list(participants)
-      assert length(participants) == 5
+      assert length(participants) == 10
     end
 
     test "returns an ok tuple with nil if match_id doesn't exist in valid region" do

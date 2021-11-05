@@ -67,7 +67,7 @@ defmodule Lolr.Reporting do
     |> List.flatten()
   end
 
-  def process_participants(participants, primary_name) do
+  def process_participants(participants, primary_name) when is_list(participants) and is_binary(primary_name) do
     participants
     |> Enum.map(fn %{"puuid" => puuid, "summonerName" => name} ->
       if name != primary_name do
@@ -77,6 +77,8 @@ defmodule Lolr.Reporting do
       end
     end)
   end
+
+  def process_participants(_participants, _primary), do: {:error, "non-conformant args"}
 
   def start_reporter(region, {:ok, %Summoner{name: name} = primary, others}) do
     all_summoners = [primary | others]

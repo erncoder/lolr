@@ -20,7 +20,7 @@ defmodule Test.Mocks.RiotApi do
   end
 
   def gen_participants() do
-    Enum.map(1..5, fn _n ->
+    Enum.map(1..10, fn _n ->
       %{
         "summonerName" => Faker.Superhero.name(),
         "puuid" => Faker.UUID.v4()
