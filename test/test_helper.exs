@@ -18,8 +18,8 @@ shared_resps = [
     status_code: 429
   },
   %MockMe.Response{
-    flag: :unauthorized,
-    body: "unauthorized",
+    flag: :forbidden,
+    body: "forbidden",
     status_code: 403
   }
 ]
@@ -53,7 +53,7 @@ routes = [
   },
   %MockMe.Route{
     name: :match_details,
-    path: ":region/match/v5/matches/by-puuid/:puuid/ids",
+    path: ":region/match/v5/matches/:match_id",
     responses:
       shared_resps ++
         [

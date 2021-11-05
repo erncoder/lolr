@@ -6,14 +6,17 @@ defmodule Test.Mocks.RiotApi do
       "name" => Faker.Superhero.name(),
       "puuid" => Faker.UUID.v4()
     }
+    |> Jason.encode!()
   end
 
   def match_list() do
-    Enum.map(1..5, fn _n -> "REG-#{Faker.UUID.v4()}" end)
+    1..5
+    |> Enum.map(fn _n -> "REG-#{Faker.UUID.v4()}" end)
+    |> Jason.encode!()
   end
 
   def match_details() do
-    %{"info" => %{"participants" => gen_participants()}}
+    %{"info" => %{"participants" => gen_participants()}} |> Jason.encode!()
   end
 
   def gen_participants() do

@@ -100,7 +100,9 @@ defmodule Lolr.Clients.Riot do
   # RESPONSE HANDLERS
   #
 
-  def handle_response({:ok, %HTTPoison.Response{body: body, status_code: 200}}) do
+  defp handle_response({:ok, %HTTPoison.Response{body: "", status_code: 200}}), do: handle_bad_call("empty body")
+
+  defp handle_response({:ok, %HTTPoison.Response{body: body, status_code: 200}}) do
     case Jason.decode(body) do
       {:ok, %{"name" => name, "puuid" => puuid}} ->
         {:ok, %Summoner{name: name, puuid: puuid}}
@@ -113,13 +115,14 @@ defmodule Lolr.Clients.Riot do
     end
   end
 
-  def handle_response({:ok, %HTTPoison.Response{status_code: 429}}), do: {:warn, :rate_limited}
+  defp handle_response({:ok, %HTTPoison.Response{status_code: 429}}), do: {:warn, :rate_limited}
+  defp handle_response({:ok, %HTTPoison.Response{status_code: 404}}), do: {:ok, nil}
 
-  def handle_response({:ok, %HTTPoison.Response{} = resp}) do
+  defp handle_response({:ok, %HTTPoison.Response{} = resp}) do
     handle_bad_call("unhandled response: #{inspect(resp)}")
   end
 
-  def handle_response(resp, _region), do: handle_bad_call("#{inspect(resp)}")
+  defp handle_response(resp), do: handle_bad_call("#{inspect(resp)}")
 
   #
   # INTERNAL API

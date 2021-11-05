@@ -23,6 +23,9 @@ defmodule Lolr.Reporting do
       other_names = others |> Enum.map(fn %Summoner{name: name} -> name end)
       {:ok, other_names}
     else
+      {"get riot data", {"get summoner", {:ok, nil}}} ->
+        {:ok, "No summoner with that name exists in the given region"}
+
       {step, result} ->
         Logger.error(
           "start failed for summoner #{summoner_name} in region #{region} on step #{step} with result #{inspect(result)}"
