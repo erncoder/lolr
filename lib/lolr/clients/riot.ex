@@ -108,7 +108,9 @@ defmodule Lolr.Clients.Riot do
     end
   end
 
-  def handle_response({:ok, %HTTPoison.Response{} = resp}, _region) do
+  def handle_response({:ok, %HTTPoison.Response{status_code: 429}}), do: {:warn, :rate_limited}
+
+  def handle_response({:ok, %HTTPoison.Response{} = resp}) do
     handle_bad_call("unhandled response: #{inspect(resp)}")
   end
 

@@ -48,7 +48,7 @@ defmodule Lolr.Reporting.Worker do
           mins_left: mins_left
         } = state
       ) do
-    Logger.debug("report tick for #{name}")
+    Logger.debug("checking flight \"#{name}\": #{inspect(state)}")
 
     Process.send_after(self(), :tick, @one_minute)
     new_last_check = get_unix_now()
@@ -72,11 +72,17 @@ defmodule Lolr.Reporting.Worker do
 
   def check_matches(%State{region: region, summoners: summoners, last_check: last_check}) do
     summoners
-    |> Enum.map(fn %Summoner{name: name, puuid: puuid} ->
+    |> Enum.take_while(fn %Summoner{name: name, puuid: puuid} ->
       case Riot.get_match_history_by_puuid(region, puuid, 5, last_check) do
         {:ok, fetched_matches} ->
-          for fetched_match <- fetched_matches,
-              do: Logger.info("Summoner #{name} completed match #{fetched_match}")
+          for fetched_match <- fetched_matches do
+            Logger.info("Summoner #{name} completed match #{fetched_match}")
+            true
+          end
+
+        {:warn, :rate_limited} ->
+          Logger.warn("Riot Client HIT THE RATE LIMIT -- skipping remaining")
+          false
       end
     end)
   end
