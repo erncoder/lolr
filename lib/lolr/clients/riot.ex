@@ -19,19 +19,23 @@ defmodule Lolr.Clients.Riot do
   # API Calls
   #
 
+  @doc """
+  Retrieves a JSON with information about a summoner by using a `region` and a summoner's `name`
+  """
   def get_summoner_by_name(region, name)
       when is_binary(name) and region in @all_regions do
-    build_summoner_url(region, name)
+    (base_uri(region) <> fetch_summoner_route(name))
     |> get(get_headers())
     |> handle_response()
   end
 
   def get_summoner_by_name(region, name),
-    do:
-      handle_bad_call(
-        "can't get summoner: invalid region (#{inspect(region)} or name (#{inspect(name)})"
-      )
+    do: handle_bad_call("can't get summoner: invalid region (#{inspect(region)} or name (#{inspect(name)})")
 
+  @doc """
+  Retrieves a list of `num_records` matches a summoner has participated in since the `since_unix` epoch by using a
+  `region` and the summoner's `puuid`
+  """
   def get_match_history_by_puuid(region, puuid, num_records, since_unix \\ 0)
 
   def get_match_history_by_puuid(region, puuid, num_records, since_unix)
@@ -39,7 +43,7 @@ defmodule Lolr.Clients.Riot do
              region in @general_regions and
              is_integer(num_records) and
              is_integer(since_unix) do
-    build_match_by_puuid_url(region, puuid)
+    (base_uri(region) <> match_by_puuid_route(puuid))
     |> get(
       get_headers(),
       params: %{
@@ -51,24 +55,22 @@ defmodule Lolr.Clients.Riot do
   end
 
   def get_match_history_by_puuid(region, puuid, _num_record, _since_unix),
-    do:
-      handle_bad_call(
-        "can't get match history: invalid region (#{inspect(region)}) or puuid #{inspect(puuid)})"
-      )
+    do: handle_bad_call("can't get match history: invalid region (#{inspect(region)}) or puuid #{inspect(puuid)})")
 
+  @doc """
+  Uses a `match_id` to retrieve an extensive JSON containing the statistics of a match, including participants' info
+  """
   def get_match_details(region, match_id)
       when is_binary(match_id) and
              region in @general_regions do
-    build_match_by_id_url(region, match_id)
+    (base_uri(region) <> match_id_route(match_id))
     |> get(get_headers())
     |> handle_response()
   end
 
   def get_match_details(region, match_id),
     do:
-      handle_bad_call(
-        "can't get match details: invalid region (#{inspect(region)}) or match_id (#{inspect(match_id)})"
-      )
+      handle_bad_call("can't get match details: invalid region (#{inspect(region)}) or match_id (#{inspect(match_id)})")
 
   #
   # REQUEST BUILDERS
@@ -82,14 +84,17 @@ defmodule Lolr.Clients.Riot do
     }
   end
 
-  defp build_summoner_url(region, name),
-    do: "https://#{region}.api.riotgames.com/lol/summoner/v4/summoners/by-name/#{name}"
+  defp fetch_summoner_route(name), do: "/summoner/v4/summoners/by-name/#{name}"
+  defp match_by_puuid_route(puuid), do: "/match/v5/matches/by-puuid/#{puuid}/ids"
+  defp match_id_route(match_id), do: "/match/v5/matches/#{match_id}"
 
-  defp build_match_by_puuid_url(region, puuid),
-    do: "https://#{region}.api.riotgames.com/lol/match/v5/matches/by-puuid/#{puuid}/ids"
-
-  defp build_match_by_id_url(region, match_id),
-    do: "https://#{region}.api.riotgames.com/lol/match/v5/matches/#{match_id}"
+  defp base_uri(region) do
+    if Mix.env() == :test do
+      "http://localhost:9081/#{region}"
+    else
+      "https://#{region}.api.riotgames.com/lol"
+    end
+  end
 
   #
   # RESPONSE HANDLERS

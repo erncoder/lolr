@@ -25,7 +25,7 @@ defmodule Lolr.MixProject do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:test), do: ["lib", "test/support", "test/mocks"]
   defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
@@ -33,9 +33,11 @@ defmodule Lolr.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:faker, "~> 0.16.0", only: [:test]},
       {:gettext, "~> 0.18"},
       {:httpoison, "~> 1.8.0"},
       {:jason, "~> 1.2"},
+      {:mock_me, "~> 0.2.0", [only: [:test], runtime: false]},
       {:phoenix, "~> 1.6.2"},
       {:plug_cowboy, "~> 2.5"},
       {:telemetry_metrics, "~> 0.6"},

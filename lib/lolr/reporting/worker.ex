@@ -45,10 +45,11 @@ defmodule Lolr.Reporting.Worker do
         :tick,
         %State{
           name: name,
-          mins_left: mins_left
+          mins_left: mins_left,
+          last_check: last_check
         } = state
       ) do
-    Logger.debug("checking flight \"#{name}\": #{inspect(state)}")
+    Logger.debug("[[ #{mins_left} ]] checking flight \"#{name}\" from epoch #{last_check}")
 
     Process.send_after(self(), :tick, @one_minute)
     new_last_check = get_unix_now()
